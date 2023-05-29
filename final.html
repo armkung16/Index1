@@ -1,0 +1,105 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>final344></map></title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+ integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+ crossorigin="" />
+ 
+ <!-- W3 CSS template -->
+ <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+ 
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+ integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+ crossorigin=""></script>
+ <style>
+ #mapid {
+ height: 800px;
+ }
+ </style>
+</head>
+<body>
+<!--แบ่งหน้าจอ-->
+    <div class="w3-row">
+        <div id="mapid" class="w3-half"></div>
+        <div id="content" class="w3-half">
+            <table class="w3-table w3-striped">
+                <tr>    
+                    <th>ชื่อแหล่งท่องเที่ยว</th>
+                    <th>ประเภท</th>
+                    <th>ระดับ</th>
+                </tr>
+                <tr>
+                    <td>น้ำตก A</td>
+                    <td>ธรรมชาติ</td>
+                    <td>A</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+<!--Link geojson file-->
+<script src = "point.js"></script>
+<!--Map control-->
+<script>
+var map = L.map("mapid").setView([13.7173769,100.4672009], 11); /*setView เพื่อเซ้ตค่าเซนเตอร์(ค่าละติจูดลองติจูดของสถานที่)เวลากดเข้าไปหน้าเว็ป*/
+ 
+        var osm = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        ).addTo(map);
+        var gsat = L.tileLayer(
+        "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+        ).addTo(map);
+ 
+var baseMaps = {
+ OSM: osm, /*ตัวด้านหน้าคือตัวที่ต้องการแสดงในหน้าเว็บ ส่วนด้านหลังต้องเหมือนกันกับตัวหลังคำว่า var*/
+ GoogleSat: gsat,
+ };
+
+
+var tourLayer = L.geoJSON(tourpoint, { //tourpoint ต้องเหมือนกันกับอันด้านบน//
+ pointToLayer: function (feature, latlng) {
+ return L.marker(latlng).bindPopup(feature.properties.name);
+ },
+ onEachFeature: function (feature, layer) {
+ layer.on("mouseover", function () {
+ document
+ .getElementById(feature.properties.name)
+ .classList.add("w3-red");
+ });
+ 
+ layer.on("mouseout", function () {
+ document
+ .getElementById(feature.properties.name)
+ .classList.remove("w3-red");
+ });
+ },
+ }).addTo(map);
+ 
+ var cont = "";
+ cont += "<table class='w3-table w3-striped'>";
+ cont += "<tr>";
+ cont += "<th>ชื่อร้านอาหาร</th>";
+ cont += "<th>ระดับความนิยม (เต็ม 5)</th>";
+ cont += "</tr>";
+ for (let i in tourpoint.features) {
+ cont += "<tr id=" + tourpoint.features[i].properties.name + ">";
+ cont += "<td>" + tourpoint.features[i].properties.name + "</td>";
+ cont += "<td>" + tourpoint.features[i].properties.level + "</td>";
+ cont += "</tr>";
+ }
+ cont += "</table>";
+ console.log(cont);
+ document.getElementById("content").innerHTML = cont;
+
+ var overlays = {สถานที่ท่องเที่ยว: tourLayer};
+ //add leyer control
+ L.control.layers(baseMaps, overlays).addTo(map);
+
+</script>
+
+</body>
+</html>
